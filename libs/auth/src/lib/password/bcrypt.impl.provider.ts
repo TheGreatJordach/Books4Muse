@@ -7,11 +7,10 @@ import * as bcrypt from 'bcrypt';
 @Injectable()
 export class BcryptImplProvider implements IHashProvider {
   private readonly saltRound: number;
-  private readonly salt: string;
+
   constructor(private readonly configService: ConfigService) {
     try {
       this.saltRound = configService.getOrThrow<number>('SALT_ROUND');
-      this.salt = bcrypt.genSaltSync(this.saltRound);
     } catch (error) {
       handleTransactionError(error, BcryptImplProvider.name);
     }
@@ -24,6 +23,7 @@ export class BcryptImplProvider implements IHashProvider {
 
   @HandleErrors
   async hash(data: string | Buffer): Promise<string> {
-    return await bcrypt.hash(data, this.salt);
+    const salt = bcrypt.genSaltSync(this.saltRound);
+    return await bcrypt.hash(data, salt);
   }
 }

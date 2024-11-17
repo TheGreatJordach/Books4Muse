@@ -5,5 +5,6 @@ import { PasswordServices } from './password.services';
 @Module({
   imports: [],
   providers: [PasswordServices, BcryptImplProvider],
+  exports: [PasswordServices, BcryptImplProvider],
 })
 export class PasswordModule {}

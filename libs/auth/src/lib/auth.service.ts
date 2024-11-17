@@ -1,10 +1,11 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { IUserAuthService } from '@book4-muse/shared';
+import { Injectable } from '@nestjs/common';
+import { UserAuthService } from '@book4-muse/shared';
+import { PasswordServices } from './password/password.services';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @Inject('IUserAuthService')
-    private readonly userAuthService: IUserAuthService,
+    private readonly userAuthService: UserAuthService,
+    private readonly passwordService: PasswordServices,
   ) {}
 }
