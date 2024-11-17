@@ -10,7 +10,7 @@ services:
   database:
     image: postgres
     restart: always
-    container_name: Book4Muse
+    container_name: Books4Muse
     environment:
       POSTGRES_USER: ${DATASOURCE_USERNAME}
       POSTGRES_PASSWORD: ${DATASOURCE_PASSWORD}

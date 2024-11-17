@@ -1,0 +1,23 @@
+# This file is used to configure Compodoc for building documentation and pushing it to GitHub Pages
+
+# The root directory of your Nx monorepo (if you have shared libraries in the libs folder)
+src: ./libs  # Update if needed, or you can set it to apps if you only have apps
+
+# Documentation Output Folder
+output: ./dist/docs  # Updated output directory, will be used for local docs generation
+
+# Enable GitHub Pages deployment
+deploy:
+  # The branch of the Git repository where your GitHub Pages will be published
+  branch: gh-pages
+  # The repository where the documentation will be pushed
+  repo: git@github.com:TheGreatJordach/Books4Muse.git
+  # Path to the directory containing the generated docs
+  dir: .doc  # Updated to the desired location of the generated docs on GitHub Pages
+  # Whether to skip pushing the files if no changes
+  skipIfNoChanges: true
+
+# Optional configurations
+theme: default  # Use the default theme, but you can use others if desired
+disablePrivate: true  # Disable private method, class, and variable documentation
+title: "My Nx Monorepo Docs"  # The title to show on the generated documentation

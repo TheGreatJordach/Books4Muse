@@ -85,6 +85,13 @@
         "staticFilePath": "dist/apps/ui/browser",
         "spa": true
       }
+
+    },
+    "compodoc": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx compodoc -p apps/ui/tsconfig.doc.json -d .doc/ui --silent"
+      }
     }
   }
 }

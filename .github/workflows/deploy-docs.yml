@@ -1,0 +1,34 @@
+name: Deploy Docs to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main  # Change to the branch you want to trigger documentation generation from
+
+jobs:
+  build-and-deploy-docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'  # Adjust to the version you're using
+
+      - name: Install dependencies
+        run: |
+          npm install -g pnpm
+          pnpm install
+
+      - name: Generate Docs
+        run: |
+          npx compodoc -p tsconfig.json -d ./dist/docs --config ./compodoc.yml
+
+      - name: Deploy Docs to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist/docs

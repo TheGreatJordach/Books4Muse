@@ -124,6 +124,11 @@ jobs:
               -Dsonar.typescript.tsconfigPath=tsconfig.json \
               -Dsonar.host.url=https://sonarcloud.io
 
+      - checkout
+      - run:
+          name: Upload Coverage to SonarCloud
+          command : |
+                  npx sonar-scanner
   migrate:
     executor: node-executor
     steps:

@@ -5,11 +5,11 @@ export const getDbConfig = async (
   ConfigService: ConfigService,
 ): Promise<TypeOrmModuleOptions> => ({
   type: 'postgres',
-  host: ConfigService.getOrThrow<string>('DATABASE_HOST'),
-  port: ConfigService.getOrThrow<number>('DATABASE_PORT'),
-  username: ConfigService.getOrThrow<string>('DATABASE_USERNAME'),
-  password: ConfigService.getOrThrow<string>('DATABASE_PASSWORD'),
-  database: ConfigService.getOrThrow<string>('DATABASE_DATABASE'),
+  host: ConfigService.getOrThrow<string>('DATASOURCE_HOST'),
+  port: ConfigService.getOrThrow<number>('DATASOURCE_PORT'),
+  username: ConfigService.getOrThrow<string>('DATASOURCE_USERNAME'),
+  password: ConfigService.getOrThrow<string>('DATASOURCE_PASSWORD'),
+  database: ConfigService.getOrThrow<string>('DATASOURCE_DATABASE'),
   entities: [],
   synchronize: true,
 });

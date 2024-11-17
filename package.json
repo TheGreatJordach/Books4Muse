@@ -4,9 +4,10 @@
   "license": "MIT",
   "scripts": {
     "prepare": "husky",
-    "compodoc:ui": "npx compodoc -p apps/ui/tsconfig.doc.json -d dist/docs/ui --silent",
-    "compodoc:api": "npx compodoc -p apps/api/tsconfig.doc.json -d dist/docs/api --silent",
-    "compodoc:all": "npm run compodoc:ui && npm run compodoc:api"
+    "compodoc:ui": "npx nx run ui:compodoc",
+    "compodoc:api": "npx nx run api:compodoc",
+    "compodoc:all": "npm run compodoc:ui && npm run compodoc:api && npm run merge-docs",
+    "merge-docs": "rm -rf .doc && mkdir .doc && cp -r .doc/ui/* .doc/ && cp -r .doc/api/* .doc/"
   },
   "private": true,
   "dependencies": {
@@ -66,6 +67,7 @@
     "@swc-node/register": "~1.9.1",
     "@swc/core": "~1.5.7",
     "@swc/helpers": "~0.5.11",
+    "@types/fs-extra": "^11.0.4",
     "@types/jest": "^29.5.12",
     "@types/node": "18.16.9",
     "@typescript-eslint/utils": "^8.0.0",
@@ -73,6 +75,7 @@
     "eslint": "9.14.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-playwright": "^1.6.2",
+    "fs-extra": "^11.2.0",
     "husky": "^9.1.6",
     "jest": "^29.7.0",
     "jest-environment-jsdom": "^29.7.0",
@@ -81,6 +84,7 @@
     "lint-staged": "^15.2.10",
     "nx": "20.1.2",
     "prettier": "^2.8.8",
+    "simple-git": "^3.27.0",
     "ts-jest": "^29.1.0",
     "ts-node": "10.9.1",
     "tslib": "^2.3.0",

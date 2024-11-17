@@ -28,6 +28,12 @@
       "options": {
         "jestConfig": "apps/api/jest.config.ts"
       }
+    },
+    "compodoc": {
+      "executor": "nx:run-commands",
+      "options": {
+        "command": "npx compodoc -p apps/api/tsconfig.doc.json -d .doc/api --silent"
+      }
     }
   }
 }
