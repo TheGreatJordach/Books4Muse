@@ -1,5 +1,12 @@
 version: 2.1
 
+orbs:
+  codecov: codecov/codecov@4.0.1
+upload-to-codecov:
+  jobs:
+    - checkout
+    - codecov/upload
+
 executors:
   node-executor:
     docker:
@@ -18,6 +25,13 @@ jobs:
             pnpm install          # Install project dependencies
             npm install -g nx     # Install Nx globally
 
+            # To speed up your builds, you can add caching for dependencies, like pnpm, node_modules, and dist,
+            # to avoid re-installing dependencies on every build. Here's an example:
+      - save_cache:
+          paths:
+            - ~/.pnpm-store
+            - node_modules
+          key: v1-dependencies-{{ checksum "pnpm-lock.yaml" }}
   lint-angular:
     executor: node-executor
     steps:
@@ -195,6 +209,10 @@ workflows:
       - test-nestjs:
           requires:
             - build-nestjs
+      - upload-to-codecov:
+          requires:
+            - test-angular
+            - test-nestjs
       - sonarcloud:
           requires:
             - test-angular
