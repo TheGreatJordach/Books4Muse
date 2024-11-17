@@ -4,7 +4,13 @@ import { UsersService } from './users.service';
 
 @Module({
   controllers: [UsersController],
-  providers: [UsersService],
+  providers: [
+    UsersService,
+    {
+      provide: 'IUserAuthService',
+      useExisting: UsersService,
+    },
+  ],
   exports: [UsersService],
 })
 export class UsersModule {}

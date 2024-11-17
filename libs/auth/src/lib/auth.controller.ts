@@ -1,7 +1,13 @@
-import { Controller } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { CreateUserDto } from '@book4-muse/shared';
 
-@Controller('auth')
+@Controller('iam')
 export class AuthController {
   constructor(private authService: AuthService) {}
+
+  @Post('register')
+  register(@Body() createUserDto: CreateUserDto) {
+    return `this handler create user with ${JSON.stringify(createUserDto)}`;
+  }
 }
