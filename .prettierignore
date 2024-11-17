@@ -1,3 +1,75 @@
-# Ignore artifacts:
-build
-coverage
+# Ignore Node.js dependencies
+node_modules/
+
+# Ignore build output
+dist/
+build/
+
+# Ignore Nx cache
+nx-cache/
+.tmp/
+
+# Ignore Docker-related files and directories
+docker-compose.yml
+docker-compose.override.yml
+docker/
+
+# Ignore environment and configuration files
+.env
+.env.*.local
+
+# Ignore Angular-specific files
+src/**/*.js
+src/**/*.map
+src/**/*.d.ts
+src/assets/
+src/environments/
+
+# Ignore generated documentation (Compodoc and Swagger)
+documentation/
+swagger.json
+swagger.yaml
+
+# Ignore Swagger UI files if generated
+swagger-static/
+src/swagger-ui/
+
+# Ignore generated files
+*.log
+*.lock
+*.bak
+*.tmp
+
+# Ignore IDE-specific files (WebStorm)
+.idea/
+*.iml
+*.code-workspace
+
+# Ignore OS-specific files
+.DS_Store
+Thumbs.db
+
+# Ignore Prettier-ignore itself
+.prettierignore
+
+# Optional: Ignore Nx workspace configuration files
+workspace.json
+project.json
+
+# Ignore JUnit coverage reports
+coverage/
+**/coverage/
+**/coverage-*.xml  # JUnit XML report files
+
+# Ignore JUnit test results
+test-results/
+test-results.xml
+**/test-results/
+
+# Compodoc-specific ignores
+.compodoc/
+compodoc-report/
+
+# Optional: Ignore npm and pnpm lock files
+package-lock.json
+pnpm-lock.yaml

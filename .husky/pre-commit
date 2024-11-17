@@ -1,1 +1,18 @@
 pnpm exec lint-staged
+
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+# Run tests with error handling
+echo "Running tests..."
+npx nx test --all || {
+  echo "Tests failed. Aborting commit."
+  exit 1
+}
+
+# Check if tests exist or were skipped
+if npx nx show projects | grep -q 'test'; then
+  echo "All tests passed. Proceeding with commit."
+else
+  echo "No tests found. Proceeding with commit."
+fi
