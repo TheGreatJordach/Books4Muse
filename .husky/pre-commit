@@ -4,11 +4,18 @@ pnpm exec lint-staged
 . "$(dirname "$0")/_/husky.sh"
 
 # Run tests with error handling
-echo "Running tests..."
-npx nx test --all || {
+echo "Running tests for Nestjs..."
+npx nx test api --all || {
   echo "Tests failed. Aborting commit."
   exit 1
 }
+
+echo "Running tests for Angular..."
+npx nx test ui --all || {
+  echo "Tests failed. Aborting commit."
+  exit 1
+}
+
 
 # Check if tests exist or were skipped
 if npx nx show projects | grep -q 'test'; then
