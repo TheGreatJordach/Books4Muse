@@ -1,0 +1,94 @@
+version: "3.8"
+# *******************************************************************************************************
+# Once the container starts, you can check the logs of the Jenkins container to see the SSH connection test:
+# >$ docker logs jenkins
+# You should see the message :
+#'Hi username! You've successfully authenticated, but GitHub does not provide shell access.'
+# This confirms that Jenkins is able to access GitHub via SSH, and the setup is working as expected.
+# *******************************************************************************************************
+services:
+  database:
+    image: postgres
+    restart: always
+    container_name: Book4Muse
+    environment:
+      POSTGRES_USER: ${DATASOURCE_USERNAME}
+      POSTGRES_PASSWORD: ${DATASOURCE_PASSWORD}
+      POSTGRES_DB: ${DATASOURCE_DATABASE}
+    ports:
+      - "${DATASOURCE_PORT}:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -d $${POSTGRES_DB} -U $${POSTGRES_USER}"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    networks:
+      - reviewShelf-network
+
+  jenkins:
+    image: jenkins/jenkins:lts
+    restart: always
+    container_name: jenkins
+    user: root
+    environment:
+      JENKINS_USER: "${JENKINS_USER}"
+      JENKINS_PASS: "${JENKINS_PASS}"
+      JAVA_OPTS: "-Djenkins.install.runSetupWizard=false"
+    ports:
+      - "8080:8080"
+      - "50000:50000" # Port for agent communication
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock # Allows Jenkins to use Docker
+      - ./ssh-secret:/root/.ssh # Mounts your SSH keys for GitHub access from ssh-secret folder
+    entrypoint:
+      - /bin/bash
+      - -c
+      - |
+        # Step 1: Ensure proper file permissions for SSH key
+        chmod 600 /root/.ssh/id_rsa
+
+        # Step 2: Add GitHub's SSH key to known_hosts
+        ssh-keyscan github.com >> /root/.ssh/known_hosts
+
+        # Step 3: Test SSH connection to GitHub
+        ssh -T git@github.com || true
+
+        # Step 4: Start Jenkins
+        exec /usr/local/bin/jenkins.sh
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/login"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - reviewShelf-network
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    restart: always
+    container_name: mailhog
+    ports:
+      - "1025:1025" # SMTP port for sending mail
+      - "8025:8025" # Web UI port for viewing emails
+    networks:
+      - reviewShelf-network
+
+  redis:
+    image: redis:latest
+    restart: always
+    container_name: redis
+    ports:
+      - "6379:6379" # Redis default port
+    networks:
+      - reviewShelf-network
+
+volumes:
+  db-data:
+  jenkins_home:
+
+networks:
+  reviewShelf-network:
+    driver: bridge

@@ -1,0 +1,151 @@
+version: 2.1
+
+executors:
+  node-executor:
+    docker:
+      - image: node:20 # Replace with a compatible Node.js version
+    working_directory: ~/repo
+
+jobs:
+  install-dependencies:
+    executor: node-executor
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            npm install -g pnpm  # Install pnpm globally
+            pnpm install          # Install project dependencies
+            npm install -g nx     # Install Nx globally
+
+  lint-angular:
+    executor: node-executor
+    steps:
+      - checkout
+      - run:
+          name: Lint the Code
+          command: |
+            npx nx lint --project=ui
+
+    lint-nestjs:
+      executor: node-executor
+      steps:
+        - checkout
+        - run:
+            name: Lint the Code
+            command: |
+              npx nx lint --project=api
+
+  build-angular:
+    executor: node-executor
+    steps:
+      - checkout
+      - run:
+          name: Build the Project
+          command: |
+            pnpm run build ui --prod
+
+  build-nestjs:
+    executor: node-executor
+    steps:
+      - checkout
+      - run:
+          name: Build the Project
+          command: |
+            pnpm run build api --prod
+
+  test-angular:
+    executor: node-executor
+    steps:
+      - checkout
+      - run:
+          name: Run Tests
+          command: |
+            npx nx test ui
+
+  test-nestjs:
+    executor: node-executor
+    steps:
+      - checkout
+      - run:
+          name: Run Tests
+          command: |
+            npx nx test api
+
+  sonarcloud:
+    executor: node-executor
+    steps:
+      - checkout
+      - run:
+          name: SonarCloud Analysis
+          command: |
+            # Install SonarCloud Scanner
+            npm install -g sonar-scanner
+
+            # Run SonarCloud analysis
+            sonar-scanner \
+              -Dsonar.projectKey=$SONAR_PROJECT_KEY \
+              -Dsonar.organization=$SONAR_ORG \
+              -Dsonar.sources=src \
+              -Dsonar.tests=src \
+              -Dsonar.test.inclusions=**/*.spec.ts \
+              -Dsonar.language=ts \
+              -Dsonar.typescript.tsconfigPath=tsconfig.json \
+              -Dsonar.host.url=https://sonarcloud.io
+
+  serve-api:
+    executor: node-executor
+    steps:
+      - checkout
+      - run:
+          name: Serve NestJS API
+          command: |
+            npx nx serve api --port 3000 --host 0.0.0.0 &
+            sleep 15  # Wait for the server to start
+
+  serve-ui:
+    executor: node-executor
+    steps:
+      - checkout
+      - run:
+          name: Serve Angular UI
+          command: |
+            npx nx serve ui --port 4200 --host 0.0.0.0 &
+            sleep 15  # Wait for the UI to start
+
+  deploy:
+    executor: node-executor
+    steps:
+      - checkout
+      - run:
+          name: Deploy to Production
+          command: |
+            echo "Deploying to production..."
+
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - install-dependencies
+      - lint:
+          requires:
+            - install-dependencies
+      - build:
+          requires:
+            - lint
+      - test:
+          requires:
+            - build
+      - sonarcloud:
+          requires:
+            - test
+      - serve-api:
+          requires:
+            - test
+      - serve-ui:
+          requires:
+            - test
+      - deploy:
+          requires:
+            - serve-api
+            - serve-ui
