@@ -27,14 +27,14 @@ jobs:
           command: |
             npx nx lint --project=ui
 
-    lint-nestjs:
-      executor: node-executor
-      steps:
-        - checkout
-        - run:
-            name: Lint the Code
-            command: |
-              npx nx lint --project=api
+  lint-nestjs:
+    executor: node-executor
+    steps:
+      - checkout
+      - run:
+          name: Lint the Code
+          command: |
+            npx nx lint --project=api
 
   build-angular:
     executor: node-executor
@@ -72,6 +72,23 @@ jobs:
           command: |
             npx nx test api
 
+  generate-docs:
+    executor: node-executor
+    steps:
+      - checkout
+      - run:
+          name: Generate Documentation
+          command: |
+            npx nx compodoc:all
+      - run:
+          name: Upload Documentation Artifacts
+          command: |
+            mkdir -p /tmp/docs
+            cp -r dist/docs /tmp/docs
+      - store_artifacts:
+          path: /tmp/docs
+          destination: docs
+
   sonarcloud:
     executor: node-executor
     steps:
@@ -80,7 +97,7 @@ jobs:
           name: SonarCloud Analysis
           command: |
             # Install SonarCloud Scanner
-            npm install -g sonar-scanner
+            pnpm install -g sonar-scanner
 
             # Run SonarCloud analysis
             sonar-scanner \
@@ -93,25 +110,58 @@ jobs:
               -Dsonar.typescript.tsconfigPath=tsconfig.json \
               -Dsonar.host.url=https://sonarcloud.io
 
-  serve-api:
+  migrate:
     executor: node-executor
     steps:
       - checkout
       - run:
-          name: Serve NestJS API
+          name: Run Migrations
           command: |
-            npx nx serve api --port 3000 --host 0.0.0.0 &
-            sleep 15  # Wait for the server to start
+            pnpm run migrate # Assuming 'migrate' script is defined for database migrations
 
-  serve-ui:
+  create-deployment-branch:
     executor: node-executor
     steps:
       - checkout
       - run:
-          name: Serve Angular UI
+          name: Create Deployment Branch
           command: |
-            npx nx serve ui --port 4200 --host 0.0.0.0 &
-            sleep 15  # Wait for the UI to start
+            DEPLOYMENT_BRANCH="deploy-$(date +%Y%m%d%H%M%S)"
+            git checkout -b $DEPLOYMENT_BRANCH
+            git push origin $DEPLOYMENT_BRANCH
+            echo "Deployment branch created: $DEPLOYMENT_BRANCH"
+            echo "DEPLOYMENT_BRANCH=$DEPLOYMENT_BRANCH" >> $BASH_ENV
+
+  deploy-to-render-angular:
+    executor: node-executor
+    steps:
+      - checkout
+      - run:
+          name: Deploy Angular App to Render
+          command: |
+            echo "Deploying Angular App to Render..."
+            # Add Render deployment commands here (e.g., using Render CLI or GitHub Actions)
+
+  deploy-to-render-nestjs:
+    executor: node-executor
+    steps:
+      - checkout
+      - run:
+          name: Deploy NestJS API to Render
+          command: |
+            echo "Deploying NestJS API to Render..."
+            # Add Render deployment commands here (e.g., using Render CLI or GitHub Actions)
+
+  delete-deployment-branch:
+    executor: node-executor
+    steps:
+      - checkout
+      - run:
+          name: Delete Deployment Branch
+          command: |
+            git branch -D $DEPLOYMENT_BRANCH
+            git push origin --delete $DEPLOYMENT_BRANCH
+            echo "Deployment branch deleted: $DEPLOYMENT_BRANCH"
 
   deploy:
     executor: node-executor
@@ -120,32 +170,62 @@ jobs:
       - run:
           name: Deploy to Production
           command: |
-            echo "Deploying to production..."
+            echo "App is Successfully deployed..."
 
 workflows:
   version: 2
   build-and-deploy:
     jobs:
       - install-dependencies
-      - lint:
+      - lint-angular:
           requires:
             - install-dependencies
-      - build:
+      - lint-nestjs:
           requires:
-            - lint
-      - test:
+            - install-dependencies
+      - build-angular:
           requires:
-            - build
+            - lint-angular
+      - build-nestjs:
+          requires:
+            - lint-nestjs
+      - test-angular:
+          requires:
+            - build-angular
+      - test-nestjs:
+          requires:
+            - build-nestjs
       - sonarcloud:
           requires:
-            - test
+            - test-angular
+            - test-nestjs
+      - generate-docs:
+          requires:
+            - test-angular
+            - test-nestjs
       - serve-api:
           requires:
-            - test
+            - test-nestjs
       - serve-ui:
           requires:
-            - test
-      - deploy:
+            - test-angular
+      - migrate:
           requires:
             - serve-api
             - serve-ui
+      - create-deployment-branch:
+          requires:
+            - migrate
+      - deploy-to-render-angular:
+          requires:
+            - create-deployment-branch
+      - deploy-to-render-nestjs:
+          requires:
+            - create-deployment-branch
+      - deploy:
+          requires:
+            - deploy-to-render-angular
+            - deploy-to-render-nestjs
+      - delete-deployment-branch:
+          requires:
+            - deploy

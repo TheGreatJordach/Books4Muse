@@ -1,9 +1,12 @@
 {
   "name": "@book4-muse/source",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "license": "MIT",
   "scripts": {
-    "prepare": "husky"
+    "prepare": "husky",
+    "compodoc:ui": "npx compodoc -p apps/ui/tsconfig.doc.json -d dist/docs/ui --silent",
+    "compodoc:api": "npx compodoc -p apps/api/tsconfig.doc.json -d dist/docs/api --silent",
+    "compodoc:all": "npm run compodoc:ui && npm run compodoc:api"
   },
   "private": true,
   "dependencies": {
@@ -42,6 +45,7 @@
     "@angular/cli": "~18.2.0",
     "@angular/compiler-cli": "~18.2.0",
     "@angular/language-service": "~18.2.0",
+    "@compodoc/compodoc": "^1.1.26",
     "@eslint/js": "^9.8.0",
     "@nestjs/schematics": "^10.0.1",
     "@nestjs/testing": "^10.0.2",
