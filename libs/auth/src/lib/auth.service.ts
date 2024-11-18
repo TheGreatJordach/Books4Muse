@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto, isValidDto, UserAuthService } from '@book4-muse/shared';
 import { PasswordServices } from './password/password.services';
 import { EUser } from '@book4-muse/shared';
+import { LoginUserDto } from '@book4-muse/shared';
 
 @Injectable()
 export class AuthService {
@@ -57,5 +58,77 @@ export class AuthService {
     await isValidDto(EUser, newCreatedUser);
 
     return newCreatedUser;
+  }
+
+  async logInUser(logInUser: LoginUserDto) {
+    // Retrieve the user
+    const persistedUser: EUser | null =
+      await this.userAuthService.findUserByEmail(logInUser.email);
+
+    if (!persistedUser) {
+      throw new HttpException(
+        {
+          errorType: 'UserNotFound',
+          where: AuthService.name,
+          date: new Date().toISOString(),
+          success: false,
+          message: 'User already exists',
+        },
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    const isValidPassword: boolean = await this.passwordService
+      .comparePassword(logInUser.password, persistedUser.password)
+      .catch((errors) => {
+        // Catch errors in password comparison
+        throw new HttpException(
+          {
+            errorType: 'IssueWithCredential',
+            where: AuthService.name,
+            date: new Date().toISOString(),
+            success: false,
+            message: `Unable to verify credential ${errors.message} `,
+          },
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      });
+
+    if (!isValidPassword) {
+      throw new HttpException(
+        {
+          errorType: 'InvalidCredential',
+          where: AuthService.name,
+          date: new Date().toISOString(),
+          success: false,
+          message: `Wrong Password or Email `,
+        },
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    return persistedUser;
+  }
+}
+
+export function handleAuthErrors(error: unknown, location: string) {
+  const typeError = error as Error;
+  console.error(
+    `Authentication Error in ${location}: ${
+      error instanceof Error ? error.message : typeError.message
+    }`,
+  );
+  if (error instanceof HttpException) {
+    throw new HttpException(
+      {
+        errorType: 'Unexpected Transaction Error',
+        location,
+        timestamp: new Date().toISOString(),
+        details: typeError ? error.message : 'Unknown error occurred',
+      },
+      HttpStatus.UNAUTHORIZED,
+    );
+  } else {
+    throw error;
   }
 }

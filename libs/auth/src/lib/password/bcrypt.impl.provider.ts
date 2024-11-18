@@ -26,7 +26,7 @@ export class BcryptImplProvider implements IHashProvider {
    * @HandleErrors
    * Returns [null, result] if successful, or [error, null] if an error occurs.
    */
-  @HandleErrors
+  @HandleErrors(true)
   async compare(data: string | Buffer, encrypted: string): Promise<boolean> {
     return await bcrypt.compare(data, encrypted);
   }
@@ -40,7 +40,7 @@ export class BcryptImplProvider implements IHashProvider {
    * @HandleErrors
    * Returns [null, result] if successful, or [error, null] if an error occurs.
    */
-  @HandleErrors
+  @HandleErrors(false)
   async hash(data: string | Buffer): Promise<string> {
     const salt = bcrypt.genSaltSync(this.saltRound);
     return await bcrypt.hash(data, salt);

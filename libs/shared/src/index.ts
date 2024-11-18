@@ -1,5 +1,6 @@
 export * from './lib/shared';
 export * from './lib/dtos/create.user.dto';
+export * from './lib/dtos/login.user.dto';
 export * from './lib/models/model.user.interface';
 export * from './lib/utils/handle.transaction.error';
 export * from './lib/utils/is.valid.dto';

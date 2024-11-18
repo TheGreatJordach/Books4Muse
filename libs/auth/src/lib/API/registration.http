@@ -1,4 +1,4 @@
-### Send POST request with json body
+###  REGISTRATION
 POST http://localhost:3000/api/iam/register
 Content-Type: application/json
 
@@ -6,4 +6,13 @@ Content-Type: application/json
   "name": "Jordach",
   "email": "jordach.content@me.fr",
   "password": "P@ssword12354"
+}
+
+###  LOGIN
+POST http://localhost:3000/api/iam/login
+Content-Type: application/json
+
+{
+"email": "jordach.content@me.fr",
+"password": "P@ssword12354"
 }
