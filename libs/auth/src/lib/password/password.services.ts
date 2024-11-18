@@ -21,11 +21,30 @@ import { BcryptImplProvider } from './bcrypt.impl.provider';
 export class PasswordServices {
   constructor(private readonly bcryptProvider: BcryptImplProvider) {}
 
+  /**
+   * Hashes the provided data using BcryptImplProvider.
+   *
+   * @param data - The data to be hashed, can be a string or Buffer.
+   * @returns A promise that resolves to the hashed string.
+   *
+   * BcryptImplProvider uses @HandleErrors decorator that
+   * Returns [null, result] if successful, or [error, null] if an error occurs.
+   */
   // Delegate hashing to bcryptProvider, no error handling here
   async hashPassword(password: string): Promise<string> {
     return await this.bcryptProvider.hash(password);
   }
 
+  /**
+   * Compares a given data string or buffer with an encrypted string to check for a match.
+   *
+   * @param data - The plain data to compare, can be a string or Buffer.
+   * @param encrypted - The encrypted string to compare against.
+   * @returns A promise that resolves to a boolean indicating whether the data matches the encrypted string.
+   *
+   * BcryptImplProvider uses @HandleErrors decorator that
+   * Returns [null, result] if successful, or [error, null] if an error occurs.
+   */
   // Delegate password comparison to bcryptProvider, no error handling here
   async comparePassword(password: string, encrypted: string): Promise<boolean> {
     return await this.bcryptProvider.compare(password, encrypted);

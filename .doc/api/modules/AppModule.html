@@ -242,9 +242,11 @@
 import { AppController } from &#x27;./app.controller&#x27;;
 import { AppService } from &#x27;./app.service&#x27;;
 import { ConfigModuleApp } from &#x27;../config/config-app.module&#x27;;
+import { FilesModule } from &#x27;@book4-muse/files&#x27;;
+import { AuthModule } from &#x27;@book4-muse/auth&#x27;;
 
 @Module({
-  imports: [ConfigModuleApp],
+  imports: [ConfigModuleApp, FilesModule, AuthModule],
   controllers: [AppController],
   providers: [AppService],
 })

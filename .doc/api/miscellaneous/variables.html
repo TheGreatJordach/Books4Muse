@@ -140,11 +140,11 @@
   ConfigService: ConfigService,
 ): Promise&lt;TypeOrmModuleOptions&gt; &#x3D;&gt; ({
   type: &#x27;postgres&#x27;,
-  host: ConfigService.getOrThrow&lt;string&gt;(&#x27;DATABASE_HOST&#x27;),
-  port: ConfigService.getOrThrow&lt;number&gt;(&#x27;DATABASE_PORT&#x27;),
-  username: ConfigService.getOrThrow&lt;string&gt;(&#x27;DATABASE_USERNAME&#x27;),
-  password: ConfigService.getOrThrow&lt;string&gt;(&#x27;DATABASE_PASSWORD&#x27;),
-  database: ConfigService.getOrThrow&lt;string&gt;(&#x27;DATABASE_DATABASE&#x27;),
+  host: ConfigService.getOrThrow&lt;string&gt;(&#x27;DATASOURCE_HOST&#x27;),
+  port: ConfigService.getOrThrow&lt;number&gt;(&#x27;DATASOURCE_PORT&#x27;),
+  username: ConfigService.getOrThrow&lt;string&gt;(&#x27;DATASOURCE_USERNAME&#x27;),
+  password: ConfigService.getOrThrow&lt;string&gt;(&#x27;DATASOURCE_PASSWORD&#x27;),
+  database: ConfigService.getOrThrow&lt;string&gt;(&#x27;DATASOURCE_DATABASE&#x27;),
   entities: [],
   synchronize: true,
 })</code>

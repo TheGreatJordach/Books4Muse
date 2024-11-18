@@ -7,3 +7,4 @@ export * from './lib/decorators/handle.errors';
 export * from './lib/interfaces/user-auth.interface';
 export * from './lib/central.module';
 export * from './lib/user.auth.service';
+export * from './lib/entity/user.entity';

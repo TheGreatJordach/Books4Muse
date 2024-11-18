@@ -15,23 +15,23 @@ export function HandleErrors(
   propertyKey: string,
   descriptor: PropertyDescriptor,
 ) {
-  const originalMethode = descriptor.value;
+  const originalMethod = descriptor.value;
+
   descriptor.value = async function (...args: any[]) {
     try {
-      return await originalMethode.apply(this, args);
+      // Return [null, result] if successful
+      const result = await originalMethod.apply(this, args);
+      return [null, result];
     } catch (error: unknown) {
-      // Log the error and add some context (method name, class name)
+      // Log the error with additional context
       const className = target.constructor.name;
       const methodName = propertyKey;
-
-      // Safely handle the error object to get the error message
       const errorMessage =
         error instanceof Error ? error.message : String(error);
 
-      // Log the error with the class and method name for context
       console.error(`Error in ${className}.${methodName}:`, errorMessage);
 
-      // Optionally, enhance the error with additional metadata
+      // Optionally enhance the error with additional metadata
       const enhancedError = {
         method: methodName,
         arguments: args,
@@ -39,12 +39,12 @@ export function HandleErrors(
         timestamp: new Date().toISOString(),
       };
 
-      // Log the enhanced error details
-      console.error('Enhanced Error:', enhancedError);
+      console.error('Enhanced Error Details:', enhancedError);
 
-      // Optionally throw a new error or return a standardized error structure
-      throw new Error(`Failed in method ${methodName}: ${errorMessage}`);
+      // Return [error, null] instead of throwing
+      return [error, null];
     }
   };
+
   return descriptor;
 }

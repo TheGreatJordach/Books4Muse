@@ -1,4 +1,4 @@
-import { IModelUser } from '@book4-muse/shared';
+import { IModelUser } from '../models/model.user.interface';
 import { Column, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('users')

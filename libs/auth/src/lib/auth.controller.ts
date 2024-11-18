@@ -8,6 +8,6 @@ export class AuthController {
 
   @Post('register')
   register(@Body() createUserDto: CreateUserDto) {
-    return `this handler create user with ${JSON.stringify(createUserDto)}`;
+    return this.authService.registerUser(createUserDto);
   }
 }
