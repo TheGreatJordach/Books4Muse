@@ -1,17 +1,25 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Inject, Injectable } from '@nestjs/common';
 import { CreateUserDto, isValidDto, UserAuthService } from '@book4-muse/shared';
 import { PasswordServices } from './password/password.services';
 import { EUser } from '@book4-muse/shared';
 import { LoginUserDto } from '@book4-muse/shared';
+import { JwtService } from '@nestjs/jwt';
+import jwtConfig from './env/jwt.config';
+import { ConfigType } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userAuthService: UserAuthService,
     private readonly passwordService: PasswordServices,
+    private readonly jwtService: JwtService,
+    @Inject(jwtConfig.KEY)
+    private readonly jwtConfiguration: ConfigType<typeof jwtConfig>,
   ) {}
 
-  async registerUser(newRegister: CreateUserDto) {
+  async registerUser(
+    newRegister: CreateUserDto,
+  ): Promise<{ accessToken: string }> {
     // Stop the process early if user already exist
     const userExist: EUser | null = await this.userAuthService.findUserByEmail(
       newRegister.email,
@@ -57,7 +65,22 @@ export class AuthService {
 
     await isValidDto(EUser, newCreatedUser);
 
-    return newCreatedUser;
+    const accessToken = await this.jwtService.signAsync(
+      {
+        sub: newCreatedUser.id,
+        email: newCreatedUser.email,
+      },
+      {
+        audience: this.jwtConfiguration.audience,
+        issuer: this.jwtConfiguration.issuer,
+        secret: this.jwtConfiguration.secret,
+        expiresIn: this.jwtConfiguration.accessTokenTtl,
+      },
+    );
+
+    return {
+      accessToken,
+    };
   }
 
   async logInUser(logInUser: LoginUserDto) {
