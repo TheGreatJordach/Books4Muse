@@ -3,8 +3,8 @@ POST http://localhost:3000/api/iam/register
 Content-Type: application/json
 
 {
-  "name": "Jordach",
-  "email": "jordach.content@me.fr",
+  "name": "Ines",
+  "email": "ines.content@me.fr",
   "password": "P@ssword12354"
 }
 
