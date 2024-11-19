@@ -95,7 +95,7 @@ export class AuthService {
           where: AuthService.name,
           date: new Date().toISOString(),
           success: false,
-          message: 'User already exists',
+          message: 'No account matches',
         },
         HttpStatus.NOT_FOUND,
       );
